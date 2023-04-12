@@ -1,0 +1,513 @@
+---
+title: "Introduction of a fee for garbage"
+outer: Yuki Nakamura
+data: 2022/10/25
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+パッケージ読み込み
+```{r}
+
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(stargazer)
+library(rdd)
+
+```
+
+CSV読み込み
+```{r}
+Df <- read.csv('Used_File_20221121.csv')
+
+
+#D <- subset(Df1, subset = (Recycling_rate_R < 70))
+
+
+stargazer(Df,type = "text",out = '変数の統計量.html')
+
+```
+
+データセット表示、各ラベルに内包される数字の個数
+```{r}
+Df
+```
+テスト用
+```{r}
+ 
+summary(Df$Recycling_rate_R)
+
+ggplot(data = Df,mapping = aes(x=Recycling_rate_R)) +   geom_histogram(colour="green",
+                 fill = "pink") 
+
+ggplot(data = filter(Df,Price > 0) , mapping = aes(x=Price)) +   geom_histogram(colour="green",
+                 fill = "pink") 
+
+ggplot(data = filter(Df,Municipalities == "Town" | Municipalities == "Village") , mapping = aes(x=Population)) +   geom_histogram(colour="green",
+                 fill = "pink") 
+ggplot(data = filter(Df,Municipalities == "Town") , mapping = aes(x=Population)) +   geom_histogram(colour="green",fill = "pink")
+
+ggplot(data = filter(Df, Municipalities == "Village") , mapping = aes(x=Population)) +   geom_histogram(colour="green",
+                 fill = "pink") 
+
+
+ggplot(data = filter(Df, Municipalities == "City") , mapping = aes(x=Population)) +   geom_histogram(colour="green",
+                 fill = "pink") 
+
+summary(Df,type = "text",out = 'summary_of_Df.html')
+
+stargazer(Df,type = "text",out = 'summary_of_Df.html')
+```
+
+
+
+都道府県ダミー (循環参照 ＝　鹿児島県)
+```{r}
+lm0 <- lm(data = Df,Recycling_rate_R ~
+             HOKKAIDO
+           + AOMORIKEN
+           + IWATEKEN
+           + MIYAGIKEN
+           + AKITAKEN
+           + YAMAGATAKEN
+           + FUKUSHIMAKEN
+           + IBARAKIKEN
+           + TOCHIGIKEN
+           + GUMMAKEN
+           + SAITAMAKEN
+           + CHIBAKEN
+           + TOKYOTO
+           + KANAGAWAKEN
+           + NIIGATAKEN
+           + TOYAMAKEN
+           + ISHIKAWAKEN
+           + FUKUIKEN
+           + YAMANASHIKEN
+           + NAGANOKEN
+           + GIFUKEN
+           + SHIZUOKAKEN
+           + AICHIKEN
+           + MIEKEN
+           + SHIGAKEN
+           + KYOTOFU
+           + OSAKAFU
+           + HYOGOKEN
+           + NARAKEN
+           + WAKAYAMAKEN
+           + TOTTORIKEN
+           + SHIMANEKEN
+           + OKAYAMAKEN
+           + HIROSHIMAKEN
+           + YAMAGUCHIKEN
+           + TOKUSHIMAKEN
+           + KAGAWAKEN
+           + EHIMEKEN
+           + KOCHIKEN
+           + FUKUOKAKEN
+           + SAGAKEN
+           + NAGASAKIKEN
+           + KUMAMOTOKEN
+           + OITAKEN
+           + MIYAGIKEN
+           + OKINAWAKEN )
+
+summary(lm0)
+
+```
+
+
+リサイクル率を被説明変数とした最小二乗法、回帰分析 (ごみ袋は価格)(市)　(鹿児島県)
+```{r}
+
+lm1 <- lm(data = filter(Df,Municipalities == "City" # | Municipalities == "Village"
+                          ),Recycling_rate_R ~ 
+             Year 
+           + log(Foreign_population)
+           + Price
+           + log(Number_of_households_Households)
+           + log(Annual_variation_thousands_of_yen)
+           + log(Population_density_per_km2_of_habitable_land_area_persons1)
+           + log(Percentage_of_population_65_years_old_and_over1)
+           + Corona
+           + HOKKAIDO
+           + AOMORIKEN
+           + IWATEKEN
+           + MIYAGIKEN
+           + AKITAKEN
+           + YAMAGATAKEN
+           + FUKUSHIMAKEN
+           + IBARAKIKEN
+           + TOCHIGIKEN
+           + GUMMAKEN
+           + SAITAMAKEN
+           + CHIBAKEN
+           + TOKYOTO
+           + KANAGAWAKEN
+           + NIIGATAKEN
+           + TOYAMAKEN
+           + ISHIKAWAKEN
+           + FUKUIKEN
+           + YAMANASHIKEN
+           + NAGANOKEN
+           + GIFUKEN
+           + SHIZUOKAKEN
+           + AICHIKEN
+           + MIEKEN
+           + SHIGAKEN
+           + KYOTOFU
+           + OSAKAFU
+           + HYOGOKEN
+           + NARAKEN
+           + WAKAYAMAKEN
+           + TOTTORIKEN
+           + SHIMANEKEN
+           + OKAYAMAKEN
+           + HIROSHIMAKEN
+           + YAMAGUCHIKEN
+           + TOKUSHIMAKEN
+           + KAGAWAKEN
+           + EHIMEKEN
+           + KOCHIKEN
+           + FUKUOKAKEN
+           + SAGAKEN
+           + NAGASAKIKEN
+           + KUMAMOTOKEN
+           + OITAKEN
+           + MIYAGIKEN
+           + OKINAWAKEN
+                                            )
+summary(lm1)
+
+```
+リサイクル率を被説明変数とした最小二乗法、回帰分析 (ごみ袋は価格)(町村)
+```{r}
+
+
+lm2 <- lm(data = filter(Df,Municipalities == "Town"  | Municipalities == "Village"
+                          ),Recycling_rate_R ~ 
+             Year 
+           + log(Foreign_population)
+           + Price
+           + log(Annual_variation_thousands_of_yen)
+           + log(Number_of_households_Households)
+           + log(Population_density_per_km2_of_habitable_land_area_persons1)
+           + log(Percentage_of_population_65_years_old_and_over1)
+           + Corona
+           + HOKKAIDO
+           + AOMORIKEN
+           + IWATEKEN
+           + MIYAGIKEN
+           + AKITAKEN
+           + YAMAGATAKEN
+           + FUKUSHIMAKEN
+           + IBARAKIKEN
+           + TOCHIGIKEN
+           + GUMMAKEN
+           + SAITAMAKEN
+           + CHIBAKEN
+           + TOKYOTO
+           + KANAGAWAKEN
+           + NIIGATAKEN
+           + TOYAMAKEN
+           + ISHIKAWAKEN
+           + FUKUIKEN
+           + YAMANASHIKEN
+           + NAGANOKEN
+           + GIFUKEN
+           + SHIZUOKAKEN
+           + AICHIKEN
+           + MIEKEN
+           + SHIGAKEN
+           + KYOTOFU
+           + OSAKAFU
+           + HYOGOKEN
+           + NARAKEN
+           + WAKAYAMAKEN
+           + TOTTORIKEN
+           + SHIMANEKEN
+           + OKAYAMAKEN
+           + HIROSHIMAKEN
+           + YAMAGUCHIKEN
+           + TOKUSHIMAKEN
+           + KAGAWAKEN
+           + EHIMEKEN
+           + KOCHIKEN
+           + FUKUOKAKEN
+           + SAGAKEN
+           + NAGASAKIKEN
+           + KUMAMOTOKEN
+           + OITAKEN
+           + MIYAGIKEN
+           + OKINAWAKEN
+                                            )
+
+summary(lm2)
+```
+リサイクル率を被説明変数とした最小二乗法、回帰分析 (ごみ袋はダミー)(市)
+```{r}
+lm3 <- lm(data = filter(Df,Municipalities == "City" # | Municipalities == "Village"
+                          ),Recycling_rate_R ~ 
+             Year 
+           + log(Foreign_population)
+           + Garbage_bags_charged
+           + log(Number_of_households_Households)
+           + log(Annual_variation_thousands_of_yen)
+           + log(Population_density_per_km2_of_habitable_land_area_persons1)
+           + log(Percentage_of_population_65_years_old_and_over1)
+           + Corona
+           + HOKKAIDO
+           + AOMORIKEN
+           + IWATEKEN
+           + MIYAGIKEN
+           + AKITAKEN
+           + YAMAGATAKEN
+           + FUKUSHIMAKEN
+           + IBARAKIKEN
+           + TOCHIGIKEN
+           + GUMMAKEN
+           + SAITAMAKEN
+           + CHIBAKEN
+           + TOKYOTO
+           + KANAGAWAKEN
+           + NIIGATAKEN
+           + TOYAMAKEN
+           + ISHIKAWAKEN
+           + FUKUIKEN
+           + YAMANASHIKEN
+           + NAGANOKEN
+           + GIFUKEN
+           + SHIZUOKAKEN
+           + AICHIKEN
+           + MIEKEN
+           + SHIGAKEN
+           + KYOTOFU
+           + OSAKAFU
+           + HYOGOKEN
+           + NARAKEN
+           + WAKAYAMAKEN
+           + TOTTORIKEN
+           + SHIMANEKEN
+           + OKAYAMAKEN
+           + HIROSHIMAKEN
+           + YAMAGUCHIKEN
+           + TOKUSHIMAKEN
+           + KAGAWAKEN
+           + EHIMEKEN
+           + KOCHIKEN
+           + FUKUOKAKEN
+           + SAGAKEN
+           + NAGASAKIKEN
+           + KUMAMOTOKEN
+           + OITAKEN
+           + MIYAGIKEN
+           + OKINAWAKEN
+                                            )
+summary(lm3)
+
+```
+
+
+リサイクル率を被説明変数とした最小二乗法、回帰分析 (ごみ袋はダミー)(町村)
+```{r}
+lm4 <- lm(data = filter(Df,Municipalities == "Town"  | Municipalities == "Village"
+                          ),Recycling_rate_R ~ 
+             Year 
+           + log(Foreign_population)
+           + Garbage_bags_charged
+           + log(Number_of_households_Households)
+           + log(Annual_variation_thousands_of_yen)
+           + log(Population_density_per_km2_of_habitable_land_area_persons1)
+           + log(Percentage_of_population_65_years_old_and_over1)
+           + Corona
+           + HOKKAIDO
+           + AOMORIKEN
+           + IWATEKEN
+           + MIYAGIKEN
+           + AKITAKEN
+           + YAMAGATAKEN
+           + FUKUSHIMAKEN
+           + IBARAKIKEN
+           + TOCHIGIKEN
+           + GUMMAKEN
+           + SAITAMAKEN
+           + CHIBAKEN
+           + TOKYOTO
+           + KANAGAWAKEN
+           + NIIGATAKEN
+           + TOYAMAKEN
+           + ISHIKAWAKEN
+           + FUKUIKEN
+           + YAMANASHIKEN
+           + NAGANOKEN
+           + GIFUKEN
+           + SHIZUOKAKEN
+           + AICHIKEN
+           + MIEKEN
+           + SHIGAKEN
+           + KYOTOFU
+           + OSAKAFU
+           + HYOGOKEN
+           + NARAKEN
+           + WAKAYAMAKEN
+           + TOTTORIKEN
+           + SHIMANEKEN
+           + OKAYAMAKEN
+           + HIROSHIMAKEN
+           + YAMAGUCHIKEN
+           + TOKUSHIMAKEN
+           + KAGAWAKEN
+           + EHIMEKEN
+           + KOCHIKEN
+           + FUKUOKAKEN
+           + SAGAKEN
+           + NAGASAKIKEN
+           + KUMAMOTOKEN
+           + OITAKEN
+           + MIYAGIKEN
+           + OKINAWAKEN
+                                            )
+          
+                                            
+summary(lm4)
+```
+
+リサイクル率を被説明変数とした最小二乗法、回帰分析 (ごみ袋は価格)(市)(有料化されている市のみ)
+```{r}
+lm5 <- lm(data = filter(Df, Municipalities == "City", Price > 0),Recycling_rate_R ~ 
+             Year 
+           
+           + log(Foreign_population)
+           + Price
+           + log(Number_of_households_Households)
+           + log(Annual_variation_thousands_of_yen)
+           + log(Population_density_per_km2_of_habitable_land_area_persons1)
+           + log(Percentage_of_population_65_years_old_and_over1)
+           + Corona
+           + HOKKAIDO
+           + AOMORIKEN
+           + IWATEKEN
+           + MIYAGIKEN
+           + AKITAKEN
+           + YAMAGATAKEN
+           + FUKUSHIMAKEN
+           + IBARAKIKEN
+           + TOCHIGIKEN
+           + GUMMAKEN
+           + SAITAMAKEN
+           + CHIBAKEN
+           + TOKYOTO
+           + KANAGAWAKEN
+           + NIIGATAKEN
+           + TOYAMAKEN
+           + ISHIKAWAKEN
+           + FUKUIKEN
+           + YAMANASHIKEN
+           + NAGANOKEN
+           + GIFUKEN
+           + SHIZUOKAKEN
+           + AICHIKEN
+           + MIEKEN
+           + SHIGAKEN
+           + KYOTOFU
+           + OSAKAFU
+           + HYOGOKEN
+           + NARAKEN
+           + WAKAYAMAKEN
+           + TOTTORIKEN
+           + SHIMANEKEN
+           + OKAYAMAKEN
+           + HIROSHIMAKEN
+           + YAMAGUCHIKEN
+           + TOKUSHIMAKEN
+           + KAGAWAKEN
+           + EHIMEKEN
+           + KOCHIKEN
+           + FUKUOKAKEN
+           + SAGAKEN
+           + NAGASAKIKEN
+           + KUMAMOTOKEN
+           + OITAKEN
+           + MIYAGIKEN
+           + OKINAWAKEN
+          
+                                            )
+
+summary(lm5)
+```
+
+stargazerで出力
+```{r}
+stargazer(lm1,lm2,lm3,lm4,lm5,type = "text",out = 'stargazer-reg-res.html')
+```
+ごみ袋価格とリサイクル率のグラフ
+
+```{r}
+ggplot(data = filter(Df,Price > 1) , mapping = aes(y=Recycling_rate_R,x=Price)) + geom_point()+ geom_smooth(method = "lm")
+ggplot(data = Df , mapping = aes(y=Recycling_rate_R,x=Price)) + geom_point()+ geom_smooth(method = "lm")
+ggplot(data = Df , mapping = aes(y=Recycling_rate_R,x=Year)) + geom_point()+ geom_smooth(method = "lm")
+
+
+```
+
+
+```{r}
+rdd_result <- RDestimate(data = Df,formula = Recycling_rate_R ~ Annual_variation_scope,
+                        cutpoint = 1)
+
+
+A <- summary(rdd_result)
+
+A
+
+sink("RDD関数 Summary結果 リサイクル率未満.text", append=TRUE)　 
+A
+sink()  
+
+```
+
+
+
+
+```{r}
+
+
+Df.fit1 <- lm( Recycling_rate_R ~ Annual_variation_scope,
+                  data = Df[Df$Annual_variation_scope <= 0, ])
+Df.fit2 <- lm( Recycling_rate_R ~ Annual_variation_scope,
+                  data = Df[Df$Annual_variation_scope > 0, ])
+
+summary(Df$Annual_variation_scope)
+
+a1l.range <- c(min(Df$Annual_variation_scope,na.rm=T),0) # min to 0
+a2l.range <- c(0, max(Df$Annual_variation_scope,0,na.rm=T)) # 0 to max
+
+summary(a1l.range)
+
+y1.Df <- predict(Df.fit1, newdata = data.frame(Annual_variation_scope = a1l.range))
+y2.Df <- predict(Df.fit2, newdata = data.frame(Annual_variation_scope = a2l.range))
+
+plot(Df$Annual_variation_scope,Df$Recycling_rate_R)
+lines(a1l.range,y1.Df,col = 'red')
+lines(a2l.range,y2.Df,col = 'red')
+abline(v=0)
+
+
+```
+
+```{r}
+RDD_Df <- lm(data = Df,Recycling_rate_R~I(Annual_variation_scope>0)+I((Annual_variation_scope>0)*Annual_variation_scope)+I((Annual_variation_scope<0)*Annual_variation_scope))
+summary(RDD_Df)
+
+
+RDD_Df2 <- lm(data = Df,Recycling_rate_R~I(Annual_variation_scope>0)+I((Annual_variation_scope>0)*Annual_variation_scope)+I((Annual_variation_scope<0)*Annual_variation_scope)
+              + I((Annual_variation_scope>0)*Annual_variation_scope^2)+I((Annual_variation_scope<0)*Annual_variation_scope^2))
+summary(RDD_Df2)
+
+stargazer(RDD_Df,RDD_Df2,type = "text",out = 'RDD sumarry結果 リサイクル率.html')
+
+```
+
